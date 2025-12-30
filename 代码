@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>古韵课表 - 古典风格课程表</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8B4513',
+                        secondary: '#D2B48C',
+                        accent: '#CD5C5C',
+                        light: '#F5F5DC',
+                        dark: '#3E2723',
+                        celadon: '#A7C957',
+                        paper: '#FFF8E7'
+                    },
+                    fontFamily: {
+                        sans: ['Arial', 'sans-serif'],
+                        serif: ['SimSun', '宋体', 'serif'],
+                        fangsong: ['FangSong', '仿宋', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 全局样式 */
+        body {
+            background-color: #FFF8E7;
+            font-family: 'SimSun', '宋体', serif;
+            color: #3E2723;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* 防止移动端点击延迟 */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            body {
+                font-size: 15px;
+            }
+            
+            h1 { font-size: 1.5rem; }
+            h2 { font-size: 1.3rem; }
+            h3 { font-size: 1.1rem; }
+            
+            .container {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            
+            /* 移动端隐藏左侧面板 */
+            .mobile-hide-left-panel {
+                display: none;
+            }
+            
+            /* 移动端主内容全宽 */
+            .mobile-full-width {
+                width: 100% !important;
+            }
+        }
+        
+        /* 宣纸纹理背景 */
+        .paper-texture {
+            background-color: #FFF8E7;
+            background-image: 
+                radial-gradient(#D2B48C 1px, transparent 1px),
+                radial-gradient(#D2B48C 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+        
+        /* 古典边框 */
+        .classical-border {
+            border: 2px solid #8B4513;
+            position: relative;
+            border-radius: 8px;
+        }
+        
+        .classical-border::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 1px solid #D2B48C;
+            border-radius: 10px;
+            pointer-events: none;
+        }
+        
+        /* 古典按钮 */
+        .classical-btn {
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            z-index: 1;
+            border: 1px solid #8B4513;
+        }
+        
+        .classical-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2);
+        }
+        
+        /* 移动端垂直课表样式 - 优化版 */
+        .mobile-day-card {
+            margin-bottom: 12px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(139, 69, 19, 0.1);
+            background-color: #FFF8E7;
+        }
+        
+        .mobile-day-header {
+            background: linear-gradient(135deg, #D2B48C, #C2A47C);
+            padding: 10px 14px;
+            font-weight: bold;
+            color: #3E2723;
+            border-bottom: 2px solid #8B4513;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .day-number {
+            background-color: #8B4513;
+            color: white;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .mobile-course-slot {
+            display: flex;
+            padding: 10px 14px;
+            border-bottom: 1px dashed #D2B48C;
+            background-color: #FFF8E7;
+            align-items: stretch;
+            min-height: 65px;
+        }
+        
+        .mobile-course-slot:last-child {
+            border-bottom: none;
+        }
+        
+        .mobile-time-col {
+            width: 40%;
+            font-size: 13px;
+            color: #8B4513;
+            padding-right: 10px;
+            border-right: 1px solid #D2B48C;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .mobile-time-label {
+            font-weight: bold;
+            margin-bottom: 3px;
+            font-size: 14px;
+        }
+        
+        .mobile-time-period {
+            font-size: 12px;
+            color: #8B4513;
+        }
+        
+        .mobile-course-col {
+            width: 60%;
+            padding-left: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .mobile-course-item {
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-size: 13px;
+            border-left: 3px solid;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .mobile-course-item:hover {
+            transform: translateX(2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        
+        .mobile-course-name {
+            font-weight: bold;
+            margin-bottom: 3px;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+        
+        .mobile-course-details {
+            font-size: 11px;
+            color: #666;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            line-height: 1.3;
+        }
+        
+        /* 移动端课程标签 */
+        .course-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            font-size: 10px;
+            margin-right: 4px;
+            margin-bottom: 2px;
+        }
+        
+        /* 空课程状态 */
+        .empty-course {
+            color: #999;
+            font-style: italic;
+            font-size: 13px;
+            padding: 10px 0;
+            text-align: center;
+        }
+        
+        /* 移动端导航栏 */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #FFF8E7;
+            border-top: 2px solid #8B4513;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(139, 69, 19, 0.1);
+        }
+        
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 6px;
+            color: #8B4513;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .mobile-nav-item.active {
+            background-color: rgba(210, 180, 140, 0.3);
+            color: #3E2723;
+        }
+        
+        .mobile-nav-icon {
+            font-size: 18px;
+            margin-bottom: 3px;
+        }
+        
+        /* 模态框 */
+        .modal {
+            transition: all 0.3s ease;
+            padding: 16px;
+        }
+        
+        .modal-content {
+            animation: modalFadeIn 0.3s ease-out;
+            max-width: 95%;
+            width: 400px;
+        }
+        
+        @media (max-width: 640px) {
+            .modal-content {
+                width: 90%;
+                max-width: 90%;
+                padding: 16px;
+            }
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 深色主题 */
+        body.dark-theme {
+            background-color: #2D2D2D;
+            color: #E0E0E0 !important;
+        }
+        
+        body.dark-theme .paper-texture {
+            background-color: #3D3D3D;
+            background-image: 
+                radial-gradient(#4D4D4D 1px, transparent 1px),
+                radial-gradient(#4D4D4D 1px, transparent 1px);
+        }
+        
+        body.dark-theme .bg-paper {
+            background-color: #3D3D3D;
+            color: #E0E0E0 !important;
+        }
+        
+        body.dark-theme .bg-light {
+            background-color: #4D4D4D;
+            color: #E0E0E0 !important;
+        }
+        
+        body.dark-theme .text-dark,
+        body.dark-theme .text-dark * {
+            color: #E0E0E0 !important;
+        }
+        
+        body.dark-theme .text-primary,
+        body.dark-theme .text-primary * {
+            color: #D2B48C !important;
+        }
+        
+        body.dark-theme .border-primary {
+            border-color: #D2B48C !important;
+        }
+        
+        body.dark-theme .classical-border {
+            border-color: #D2B48C;
+        }
+        
+        body.dark-theme .classical-border::before {
+            border-color: #8B4513;
+        }
+        
+        body.dark-theme input,
+        body.dark-theme select,
+        body.dark-theme textarea {
+            background-color: #4D4D4D !important;
+            color: #E0E0E0 !important;
+            border-color: #D2B48C !important;
+        }
+        
+        body.dark-theme input::placeholder,
+        body.dark-theme select::placeholder,
+        body.dark-theme textarea::placeholder {
+            color: #AAAAAA !important;
+        }
+        
+        body.dark-theme .modal-content {
+            background-color: #3D3D3D !important;
+            color: #E0E0E0 !important;
+        }
+        
+        body.dark-theme .mobile-day-header {
+            background: linear-gradient(135deg, #4D4D4D, #3D3D3D);
+            color: #D2B48C;
+            border-bottom: 2px solid #D2B48C;
+        }
+        
+        body.dark-theme .day-number {
+            background-color: #D2B48C;
+            color: #3E2723;
+        }
+        
+        body.dark-theme .mobile-course-slot {
+            background-color: #3D3D3D;
+            border-bottom: 1px dashed #5D5D5D;
+        }
+        
+        body.dark-theme .mobile-time-col {
+            color: #D2B48C;
+            border-right: 1px solid #5D5D5D;
+        }
+        
+        body.dark-theme .mobile-time-period {
+            color: #D2B48C;
+        }
+        
+        body.dark-theme .mobile-course-details {
+            color: #AAAAAA;
+        }
+        
+        body.dark-theme .mobile-nav {
+            background-color: #3D3D3D;
+            border-top: 2px solid #D2B48C;
+        }
+        
+        body.dark-theme .mobile-nav-item {
+            color: #D2B48C;
+        }
+        
+        body.dark-theme .mobile-nav-item.active {
+            background-color: rgba(139, 69, 19, 0.3);
+            color: #E0E0E0;
+        }
+        
+        body.dark-theme .empty-course {
+            color: #AAAAAA;
+        }
+        
+        /* 加载动画 */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #FFF8E7;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #D2B48C;
+            border-top-color: #8B4513;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 移动端滚动优化 */
+        .mobile-scroll {
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* 防止按钮点击延迟 */
+        button, a {
+            touch-action: manipulation;
+        }
+        
+        /* 修复豆包环境问题 - 强制事件处理 */
+        .course-item, .course-list-item, button, .mobile-course-item {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        /* 周数输入框修复 */
+        .week-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .week-input-container input {
+            width: 80px;
+            text-align: center;
+            padding: 8px 12px;
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        
+        .week-input-container input::-webkit-outer-spin-button,
+        .week-input-container input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .week-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .week-number {
+            font-weight: bold;
+            color: #8B4513;
+            font-size: 16px;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        body.dark-theme .week-number {
+            color: #D2B48C;
+        }
+        
+        /* 桌面端表格样式 */
+        .desktop-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .desktop-table th,
+        .desktop-table td {
+            border: 1px solid #8B4513;
+            padding: 8px;
+            text-align: center;
+            min-height: 70px;
+            vertical-align: top;
+        }
+        
+        .desktop-table th {
+            background-color: #D2B48C;
+            font-weight: bold;
+            color: #3E2723;
+        }
+        
+        .desktop-time-cell {
+            background-color: rgba(210, 180, 140, 0.2);
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .desktop-course-item {
+            padding: 4px 6px;
+            border-radius: 4px;
+            margin: 2px 0;
+            font-size: 13px;
+            cursor: pointer;
+            border-left: 3px solid;
+        }
+        
+        .desktop-course-name {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        
+        .desktop-course-location {
+            font-size: 11px;
+        }
+        
+        /* 响应式显示控制 */
+        .desktop-only {
+            display: block;
+        }
+        
+        .mobile-only {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .desktop-only {
+                display: none !important;
+            }
+            
+            .mobile-only {
+                display: block !important;
+            }
+        }
+        
+        /* 豆包环境特殊修复 */
+        #delete-course, #edit-course {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        /* 修复模态框内文本颜色 */
+        .modal-content label {
+            color: inherit !important;
+        }
+        
+        body.dark-theme .modal-content label {
+            color: #E0E0E0 !important;
+        }
+        
+        body.dark-theme .modal-content button:not(.classical-btn) {
+            color: #E0E0E0 !important;
+        }
+        
+        /* 课程颜色选项 */
+        .color-option {
+            transition: all 0.2s ease;
+        }
+        
+        .color-option.selected {
+            border: 2px solid #3E2723;
+            transform: scale(1.1);
+        }
+        
+        body.dark-theme .color-option.selected {
+            border: 2px solid #E0E0E0;
+        }
+        
+        /* 课程列表项 */
+        .course-list-item {
+            transition: all 0.2s ease;
+            border-radius: 6px;
+        }
+        
+        .course-list-item:hover {
+            transform: translateX(3px);
+            box-shadow: 0 3px 6px rgba(139, 69, 19, 0.15);
+        }
+        
+        /* 移动端侧边栏 */
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            height: 100%;
+            background-color: #FFF8E7;
+            z-index: 1001;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            padding: 20px 15px;
+            overflow-y: auto;
+        }
+        
+        .mobile-sidebar.active {
+            right: 0;
+        }
+        
+        .mobile-sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .mobile-sidebar-overlay.active {
+            display: block;
+        }
+        
+        /* 移动端底部空间 */
+        .mobile-bottom-padding {
+            padding-bottom: 70px;
+        }
+        
+        /* 移动端快速操作按钮 */
+        .mobile-fab {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: #8B4513;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(139, 69, 19, 0.3);
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-fab:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="paper-texture">
+    <!-- 加载动画 -->
+    <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+        <div class="text-primary font-fangsong text-lg">古韵课表加载中...</div>
+    </div>
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-paper border-b-2 border-primary shadow-md hidden" id="main-header">
+        <div class="container mx-auto px-3 py-2 md:px-4 md:py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2 md:space-x-3">
+                <div class="h-8 w-8 md:h-10 md:w-10 flex items-center justify-center bg-primary rounded-full">
+                    <i class="fa-solid fa-book text-white text-base md:text-xl"></i>
+                </div>
+                <h1 class="text-lg md:text-2xl font-fangsong font-bold text-primary">古韵课表</h1>
+            </div>
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <div class="text-sm md:text-lg font-fangsong text-dark" id="current-date"></div>
+                <button id="toggle-theme" class="classical-btn bg-secondary text-dark px-3 py-1 rounded-md text-sm md:text-base">
+                    <i class="fa-solid fa-moon mr-1"></i> 主题
+                </button>
+                <!-- 移动端菜单按钮 -->
+                <button id="mobile-menu-btn" class="mobile-only text-primary text-xl">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容区 -->
+    <main class="container mx-auto px-3 py-4 md:px-4 md:py-6 flex flex-col lg:flex-row gap-4 md:gap-6 hidden mobile-bottom-padding" id="main-content">
+        <!-- 左侧课程管理面板 - 桌面端 -->
+        <aside class="lg:w-1/3 xl:w-1/4 bg-paper p-3 md:p-4 rounded-lg classical-border shadow-lg desktop-only">
+            <div class="flex justify-between items-center mb-3 md:mb-4">
+                <h2 class="text-lg md:text-xl font-fangsong font-bold text-primary">课程管理</h2>
+                <button id="add-course-btn" class="classical-btn bg-accent text-white px-3 py-1 rounded-md text-sm md:text-base">
+                    <i class="fa-solid fa-plus mr-1"></i> 添加课程
+                </button>
+            </div>
+            
+            <div class="mb-3 md:mb-4">
+                <input type="text" id="search-courses" placeholder="搜索课程..." class="w-full px-3 py-2 border border-secondary rounded-md bg-light focus:outline-none focus:ring-1 focus:ring-primary text-dark">
+            </div>
+            
+            <div class="space-y-2 max-h-[300px] md:max-h-[400px] overflow-y-auto scrollbar-chinese" id="course-list">
+                <!-- 课程列表动态生成 -->
+            </div>
+        </aside>
+
+        <!-- 右侧课表主体 -->
+        <section class="lg:w-2/3 xl:w-3/4 bg-paper p-3 md:p-4 rounded-lg classical-border shadow-lg mobile-full-width" id="timetable-section">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 space-y-3 md:space-y-0">
+                <h2 class="text-lg md:text-xl font-fangsong font-bold text-primary">本周课程表</h2>
+                <div class="week-input-container">
+                    <button id="prev-week" class="classical-btn bg-secondary text-dark px-3 py-1 rounded-md">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div class="week-input-wrapper">
+                        <span class="week-number" id="current-week-display">1</span>
+                        <span class="text-dark">周</span>
+                    </div>
+                    <button id="next-week" class="classical-btn bg-secondary text-dark px-3 py-1 rounded-md">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 桌面端课表表格 -->
+            <div class="desktop-only table-container mobile-scroll">
+                <table class="desktop-table">
+                    <thead>
+                        <tr>
+                            <th class="text-center text-dark">时间/星期</th>
+                            <th class="text-center text-dark">周一</th>
+                            <th class="text-center text-dark">周二</th>
+                            <th class="text-center text-dark">周三</th>
+                            <th class="text-center text-dark">周四</th>
+                            <th class="text-center text-dark">周五</th>
+                        </tr>
+                    </thead>
+                    <tbody id="desktop-timetable-body">
+                        <!-- 桌面端课表动态生成 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 移动端垂直课表 -->
+            <div class="mobile-only" id="mobile-timetable">
+                <!-- 移动端课表动态生成 -->
+            </div>
+            
+            <!-- 节气与节日提示 -->
+            <div class="mt-4 md:mt-6 p-3 bg-light rounded-md border border-secondary desktop-only">
+                <h3 class="text-base md:text-lg font-fangsong font-bold text-primary mb-2">节气与节日</h3>
+                <div class="flex flex-wrap gap-2" id="calendar-notes">
+                    <span class="px-2 py-1 bg-accent text-white rounded-full text-xs md:text-sm">12月22日 冬至</span>
+                    <span class="px-2 py-1 bg-celadon text-dark rounded-full text-xs md:text-sm">1月1日 元旦</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 移动端侧边栏 -->
+    <div class="mobile-sidebar" id="mobile-sidebar">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-fangsong font-bold text-primary">课程管理</h2>
+            <button id="close-sidebar" class="text-dark text-xl">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        
+        <button id="mobile-add-course-btn" class="classical-btn bg-accent text-white w-full py-3 rounded-md mb-4">
+            <i class="fa-solid fa-plus mr-2"></i> 添加课程
+        </button>
+        
+        <div class="mb-4">
+            <input type="text" id="mobile-search-courses" placeholder="搜索课程..." class="w-full px-3 py-2 border border-secondary rounded-md bg-light focus:outline-none focus:ring-1 focus:ring-primary text-dark">
+        </div>
+        
+        <div class="space-y-2 max-h-[60vh] overflow-y-auto" id="mobile-course-list">
+            <!-- 移动端课程列表动态生成 -->
+        </div>
+    </div>
+    
+    <div class="mobile-sidebar-overlay" id="mobile-sidebar-overlay"></div>
+
+    <!-- 移动端导航栏 -->
+    <div class="mobile-nav mobile-only">
+        <div class="mobile-nav-item active" data-page="timetable">
+            <div class="mobile-nav-icon">
+                <i class="fa-solid fa-calendar-days"></i>
+            </div>
+            <div>课表</div>
+        </div>
+        <div class="mobile-nav-item" data-page="courses">
+            <div class="mobile-nav-icon">
+                <i class="fa-solid fa-book"></i>
+            </div>
+            <div>课程</div>
+        </div>
+        <div class="mobile-nav-item" data-page="settings">
+            <div class="mobile-nav-icon">
+                <i class="fa-solid fa-gear"></i>
+            </div>
+            <div>设置</div>
+        </div>
+    </div>
+
+    <!-- 移动端浮动按钮 -->
+    <button id="mobile-fab" class="mobile-fab mobile-only">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <!-- 添加/编辑课程模态框 -->
+    <div id="course-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="modal-content bg-paper p-4 md:p-6 rounded-lg classical-border shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg md:text-xl font-fangsong font-bold text-primary" id="modal-title">添加课程</h3>
+                <button id="close-modal" class="text-dark hover:text-accent text-xl">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="course-form" class="space-y-4">
+                <input type="hidden" id="course-id">
+                
+                <div>
+                    <label for="course-name" class="block text-dark mb-1 text-sm md:text-base">课程名称</label>
+                    <input type="text" id="course-name" class="w-full px-3 py-2 border border-secondary rounded-md bg-light focus:outline-none focus:ring-1 focus:ring-primary text-sm md:text-base text-dark" required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3 md:gap-4">
+                    <div>
+                        <label for="course-day" class="block text-dark mb-1 text-sm md:text-base">星期</label>
+                        <select id="course-day" class="w-full px-3 py-2 border border-secondary rounded-md bg-light focus:outline-none focus:ring-1 focus:ring-primary text-sm md:text-base text-dark" required>
+                            <option value="">请选择</option>
+                            <option value="1">周一</option>
+                            <option value="2">周二</option>
+                            <option value="3">周三</option>
+                            <option value="4">周四</option>
+                            <option value="5">周五</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="course-time" class="block text-dark mb-1 text-sm md:text-base">时间段</label>
+                        <select id="course-time" class="w-full px-3 py-2 border border-secondary rounded-md bg-light focus:outline-none focus:ring-1 focus:ring-primary text-sm md:text-base text-dark" required>
+                            <option value="">请选择</option>
+                            <option value="1">第一节 08:30-09:10</option>
+                            <option value="2">第二节 09:15-09:55</option>
+                            <option value="3">第三节 10:15-10:55</option>
+                            <option value="4">第四节 11:00-11:40</option>
+                            <option value="5">第五节 11:45-12:25</option>
+                            <option value="6">第六节 13:00-14:10</option>
+                            <option value="7">第七节 14:15-14:55</option>
+                            <option value="8">第八节 15:00-15:40</option>
+                            <option value="9">第九节 16:00-16:40</option>
+                            <option value="10">第十节 16:45-17:25</option>
+                            <option value="11">第十二、十三节 19:00-20:20</option>
+                            <option value="12">第十三、十四节 20:30-21:45</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="course-location" class="block text-dark mb-1 text-sm md:text-base">上课地点</label>
+                    <input type="text" id="course-location" class="w-full px-3 py-2 border border-secondary rounded-md bg-light focus:outline-none focus:ring-1 focus:ring-primary text-sm md:text-base text-dark" placeholder="例如：教学楼A101">
+                </div>
+                
+                <div>
+                    <label for="course-teacher" class="block text-dark mb-1 text-sm md:text-base">授课教师</label>
+                    <input type="text" id="course-teacher" class="w-full px-3 py-2 border border-secondary rounded-md bg-light focus:outline-none focus:ring-1 focus:ring-primary text-sm md:text-base text-dark" placeholder="例如：张老师">
+                </div>
+                
+                <div>
+                    <label class="block text-dark mb-1 text-sm md:text-base">课程颜色</label>
+                    <div class="grid grid-cols-6 gap-2">
+                        <div class="color-option w-7 h-7 md:w-8 md:h-8 rounded-full bg-accent cursor-pointer border-2 border-transparent" data-color="#CD5C5C"></div>
+                        <div class="color-option w-7 h-7 md:w-8 md:h-8 rounded-full bg-celadon cursor-pointer border-2 border-transparent" data-color="#A7C957"></div>
+                        <div class="color-option w-7 h-7 md:w-8 md:h-8 rounded-full bg-blue-500 cursor-pointer border-2 border-transparent" data-color="#3B82F6"></div>
+                        <div class="color-option w-7 h-7 md:w-8 md:h-8 rounded-full bg-purple-500 cursor-pointer border-2 border-transparent" data-color="#9333EA"></div>
+                        <div class="color-option w-7 h-7 md:w-8 md:h-8 rounded-full bg-yellow-500 cursor-pointer border-2 border-transparent" data-color="#EAB308"></div>
+                        <div class="color-option w-7 h-7 md:w-8 md:h-8 rounded-full bg-pink-500 cursor-pointer border-2 border-transparent" data-color="#EC4899"></div>
+                    </div>
+                    <input type="hidden" id="course-color" value="#CD5C5C">
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" id="cancel-course" class="px-3 py-2 border border-secondary rounded-md hover:bg-secondary hover:bg-opacity-30 text-sm md:text-base text-dark">取消</button>
+                    <button type="submit" class="classical-btn bg-primary text-white px-4 py-2 rounded-md text-sm md:text-base">保存课程</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 课程详情模态框 -->
+    <div id="course-detail-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="modal-content bg-paper p-4 md:p-6 rounded-lg classical-border shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg md:text-xl font-fangsong font-bold text-primary" id="detail-course-name">课程详情</h3>
+                <button id="close-detail-modal" class="text-dark hover:text-accent text-xl">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-3 mb-6">
+                <div class="flex items-start">
+                    <span class="w-20 text-dark text-sm md:text-base">上课时间：</span>
+                    <span id="detail-course-time" class="flex-1 text-sm md:text-base text-dark"></span>
+                </div>
+                <div class="flex items-start">
+                    <span class="w-20 text-dark text-sm md:text-base">上课地点：</span>
+                    <span id="detail-course-location" class="flex-1 text-sm md:text-base text-dark"></span>
+                </div>
+                <div class="flex items-start">
+                    <span class="w-20 text-dark text-sm md:text-base">授课教师：</span>
+                    <span id="detail-course-teacher" class="flex-1 text-sm md:text-base text-dark"></span>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3">
+                <button id="edit-course" class="px-4 py-2 border border-secondary rounded-md hover:bg-secondary hover:bg-opacity-30 text-sm md:text-base text-dark">编辑</button>
+                <button id="delete-course" class="px-4 py-2 bg-accent text-white rounded-md hover:bg-opacity-80 text-sm md:text-base">删除</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let courses = JSON.parse(localStorage.getItem('classical-timetable-courses')) || [];
+        let currentCourseId = null;
+        let currentWeek = 1;
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('古韵课表初始化...');
+            
+            // 显示加载动画
+            setTimeout(function() {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('main-header').classList.remove('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                
+                // 初始化应用
+                initApp();
+            }, 300);
+        });
+        
+        // 初始化应用
+        function initApp() {
+            // 更新当前日期
+            updateCurrentDate();
+            
+            // 更新当前周数
+            updateWeekNumber();
+            
+            // 渲染课程列表
+            renderCourseList();
+            renderMobileCourseList();
+            
+            // 渲染课表
+            renderTimetable();
+            
+            // 绑定所有事件
+            bindAllEvents();
+            
+            console.log('应用初始化完成，课程数量:', courses.length);
+        }
+        
+        // 绑定所有事件
+        function bindAllEvents() {
+            // 添加课程按钮
+            document.getElementById('add-course-btn').addEventListener('click', openAddCourseModal);
+            document.getElementById('mobile-add-course-btn').addEventListener('click', openAddCourseModal);
+            document.getElementById('mobile-fab').addEventListener('click', openAddCourseModal);
+            
+            // 关闭/取消课程模态框
+            document.getElementById('close-modal').addEventListener('click', closeCourseModal);
+            document.getElementById('cancel-course').addEventListener('click', closeCourseModal);
+            
+            // 保存课程
+            document.getElementById('course-form').addEventListener('submit', saveCourse);
+            
+            // 筛选课程
+            document.getElementById('search-courses').addEventListener('input', function() {
+                const filter = this.value.trim();
+                renderCourseList(filter);
+                renderMobileCourseList(filter);
+            });
+            
+            document.getElementById('mobile-search-courses').addEventListener('input', function() {
+                const filter = this.value.trim();
+                renderCourseList(filter);
+                renderMobileCourseList(filter);
+            });
+            
+            // 周切换
+            document.getElementById('prev-week').addEventListener('click', function() {
+                if (currentWeek > 1) {
+                    currentWeek--;
+                    updateWeekDisplay();
+                    renderTimetable();
+                }
+            });
+            
+            document.getElementById('next-week').addEventListener('click', function() {
+                if (currentWeek < 53) {
+                    currentWeek++;
+                    updateWeekDisplay();
+                    renderTimetable();
+                }
+            });
+            
+            // 切换主题
+            document.getElementById('toggle-theme').addEventListener('click', toggleTheme);
+            
+            // 点击模态框外部关闭
+            document.getElementById('course-modal').addEventListener('click', function(e) {
+                if (e.target === e.currentTarget) closeCourseModal();
+            });
+            
+            document.getElementById('course-detail-modal').addEventListener('click', function(e) {
+                if (e.target === e.currentTarget) closeDetailModal();
+            });
+            
+            // 颜色选择器
+            document.querySelectorAll('.color-option').forEach(function(option) {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.color-option').forEach(function(o) {
+                        o.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    document.getElementById('course-color').value = this.dataset.color;
+                });
+            });
+            
+            // 详情模态框按钮
+            document.getElementById('close-detail-modal').addEventListener('click', closeDetailModal);
+            document.getElementById('edit-course').addEventListener('click', editCourse);
+            document.getElementById('delete-course').addEventListener('click', deleteCourse);
+            
+            // 移动端侧边栏
+            document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+                document.getElementById('mobile-sidebar').classList.add('active');
+                document.getElementById('mobile-sidebar-overlay').classList.add('active');
+            });
+            
+            document.getElementById('close-sidebar').addEventListener('click', function() {
+                document.getElementById('mobile-sidebar').classList.remove('active');
+                document.getElementById('mobile-sidebar-overlay').classList.remove('active');
+            });
+            
+            document.getElementById('mobile-sidebar-overlay').addEventListener('click', function() {
+                document.getElementById('mobile-sidebar').classList.remove('active');
+                this.classList.remove('active');
+            });
+            
+            // 移动端导航栏
+            document.querySelectorAll('.mobile-nav-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    // 移除所有active类
+                    document.querySelectorAll('.mobile-nav-item').forEach(function(navItem) {
+                        navItem.classList.remove('active');
+                    });
+                    
+                    // 为当前项添加active类
+                    this.classList.add('active');
+                    
+                    const page = this.getAttribute('data-page');
+                    
+                    if (page === 'timetable') {
+                        // 显示课表页面
+                        document.getElementById('timetable-section').style.display = 'block';
+                        // 关闭侧边栏
+                        document.getElementById('mobile-sidebar').classList.remove('active');
+                        document.getElementById('mobile-sidebar-overlay').classList.remove('active');
+                    } else if (page === 'courses') {
+                        // 打开课程侧边栏
+                        document.getElementById('mobile-sidebar').classList.add('active');
+                        document.getElementById('mobile-sidebar-overlay').classList.add('active');
+                        // 隐藏课表
+                        document.getElementById('timetable-section').style.display = 'none';
+                    } else if (page === 'settings') {
+                        // 切换主题
+                        toggleTheme();
+                        // 切换回课表
+                        setTimeout(function() {
+                            document.querySelector('.mobile-nav-item[data-page="timetable"]').click();
+                        }, 100);
+                    }
+                });
+            });
+        }
+        
+        // 更新当前日期
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('zh-CN', options);
+        }
+        
+        // 更新当前周数
+        function updateWeekNumber() {
+            const now = new Date();
+            const firstDayOfYear = new Date(now.getFullYear(), 0, 1);
+            const pastDaysOfYear = (now - firstDayOfYear) / 86400000;
+            currentWeek = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+            updateWeekDisplay();
+        }
+        
+        // 更新周数显示
+        function updateWeekDisplay() {
+            document.getElementById('current-week-display').textContent = currentWeek;
+        }
+        
+        // 渲染课程列表（桌面端）
+        function renderCourseList(filter = '') {
+            const courseList = document.getElementById('course-list');
+            renderCourseListToElement(courseList, filter);
+        }
+        
+        // 渲染移动端课程列表
+        function renderMobileCourseList(filter = '') {
+            const courseList = document.getElementById('mobile-course-list');
+            renderCourseListToElement(courseList, filter);
+        }
+        
+        // 通用渲染课程列表函数
+        function renderCourseListToElement(element, filter = '') {
+            const filteredCourses = courses.filter(function(course) {
+                const searchText = filter.toLowerCase();
+                return course.name.toLowerCase().includes(searchText) ||
+                       (course.location && course.location.toLowerCase().includes(searchText)) ||
+                       (course.teacher && course.teacher.toLowerCase().includes(searchText));
+            });
+            
+            if (filteredCourses.length === 0) {
+                element.innerHTML = `
+                    <div class="text-center text-gray-500 py-6">
+                        <i class="fa-solid fa-book-open text-2xl mb-2"></i>
+                        <div class="text-dark">暂无课程</div>
+                        <div class="text-xs mt-2 text-dark">点击"添加课程"按钮开始</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let courseListHTML = '';
+            filteredCourses.forEach(function(course) {
+                courseListHTML += `
+                    <div class="course-list-item p-3 bg-light rounded-md border border-secondary cursor-pointer" data-id="${course.id}">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-sm md:text-base" style="color: ${course.color}">${course.name}</h4>
+                            <span class="text-xs text-gray-500">${getDayName(course.day)} ${getTimeSlotShort(course.time)}</span>
+                        </div>
+                        <div class="text-xs mt-1 text-dark">
+                            <span>${course.location || '地点未设置'}</span>
+                            ${course.teacher ? `<span class="ml-2">${course.teacher}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            element.innerHTML = courseListHTML;
+            
+            // 为课程项添加点击事件
+            element.querySelectorAll('.course-list-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    const courseId = this.getAttribute('data-id');
+                    showCourseDetail(courseId);
+                    // 移动端关闭侧边栏
+                    if (window.innerWidth <= 768) {
+                        document.getElementById('mobile-sidebar').classList.remove('active');
+                        document.getElementById('mobile-sidebar-overlay').classList.remove('active');
+                        // 显示课表页面
+                        document.getElementById('timetable-section').style.display = 'block';
+                        // 激活课表导航
+                        document.querySelectorAll('.mobile-nav-item').forEach(function(navItem) {
+                            navItem.classList.remove('active');
+                        });
+                        document.querySelector('.mobile-nav-item[data-page="timetable"]').classList.add('active');
+                    }
+                });
+            });
+        }
+        
+        // 渲染课表
+        function renderTimetable() {
+            // 渲染桌面端课表
+            renderDesktopTimetable();
+            
+            // 渲染移动端课表
+            renderMobileTimetable();
+        }
+        
+        // 渲染桌面端课表
+        function renderDesktopTimetable() {
+            const timetableBody = document.getElementById('desktop-timetable-body');
+            
+            // 根据深圳大学时间表创建时间槽位数据
+            const timeSlots = [
+                { time: 1, label: '第一节', period: '08:30-09:10', section: '上午' },
+                { time: 2, label: '第二节', period: '09:15-09:55', section: '上午' },
+                { time: 3, label: '第三节', period: '10:15-10:55', section: '上午' },
+                { time: 4, label: '第四节', period: '11:00-11:40', section: '上午' },
+                { time: 5, label: '第五节', period: '11:45-12:25', section: '上午' },
+                { time: 6, label: '第六节', period: '13:00-14:10', section: '下午' },
+                { time: 7, label: '第七节', period: '14:15-14:55', section: '下午' },
+                { time: 8, label: '第八节', period: '15:00-15:40', section: '下午' },
+                { time: 9, label: '第九节', period: '16:00-16:40', section: '下午' },
+                { time: 10, label: '第十节', period: '16:45-17:25', section: '下午' },
+                { time: 11, label: '晚自习', period: '19:00-20:20', section: '晚上' },
+                { time: 12, label: '晚自习', period: '20:30-21:45', section: '晚上' }
+            ];
+            
+            let currentSection = '';
+            let html = '';
+            
+            timeSlots.forEach(function(slot) {
+                // 添加时段标题行
+                if (slot.section !== currentSection) {
+                    currentSection = slot.section;
+                    html += `
+                        <tr>
+                            <td colspan="6" class="bg-secondary bg-opacity-30 font-bold text-center text-dark py-2">
+                                ${currentSection}
+                            </td>
+                        </tr>
+                    `;
+                }
+                
+                html += `<tr>`;
+                html += `<td class="desktop-time-cell">${slot.label}<br><span class="text-xs">${slot.period}</span></td>`;
+                
+                // 添加每天的课程
+                for (let day = 1; day <= 5; day++) {
+                    const cellCourses = courses.filter(function(course) {
+                        return parseInt(course.day) === day && parseInt(course.time) === slot.time;
+                    });
+                    
+                    html += `<td class="relative" data-day="${day}" data-time="${slot.time}">`;
+                    
+                    if (cellCourses.length > 0) {
+                        cellCourses.forEach(function(course) {
+                            const textColor = getContrastColor(course.color);
+                            html += `
+                                <div class="desktop-course-item" style="background-color: ${course.color}; color: ${textColor};" data-id="${course.id}">
+                                    <div class="desktop-course-name">${course.name}</div>
+                                    <div class="desktop-course-location">${course.location || ''}</div>
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    html += `</td>`;
+                }
+                
+                html += `</tr>`;
+            });
+            
+            timetableBody.innerHTML = html;
+            
+            // 为桌面端课程项添加点击事件
+            document.querySelectorAll('.desktop-course-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    const courseId = this.getAttribute('data-id');
+                    showCourseDetail(courseId);
+                });
+            });
+        }
+        
+        // 渲染移动端课表
+        function renderMobileTimetable() {
+            const mobileTimetable = document.getElementById('mobile-timetable');
+            
+            // 按天分组课程
+            const days = [
+                { id: 1, name: '周一' },
+                { id: 2, name: '周二' },
+                { id: 3, name: '周三' },
+                { id: 4, name: '周四' },
+                { id: 5, name: '周五' }
+            ];
+            
+            // 深圳大学时间槽位数据
+            const timeSlots = {
+                1: { label: '第一节', period: '08:30-09:10' },
+                2: { label: '第二节', period: '09:15-09:55' },
+                3: { label: '第三节', period: '10:15-10:55' },
+                4: { label: '第四节', period: '11:00-11:40' },
+                5: { label: '第五节', period: '11:45-12:25' },
+                6: { label: '第六节', period: '13:00-14:10' },
+                7: { label: '第七节', period: '14:15-14:55' },
+                8: { label: '第八节', period: '15:00-15:40' },
+                9: { label: '第九节', period: '16:00-16:40' },
+                10: { label: '第十节', period: '16:45-17:25' },
+                11: { label: '晚自习', period: '19:00-20:20' },
+                12: { label: '晚自习', period: '20:30-21:45' }
+            };
+            
+            let html = '';
+            
+            days.forEach(function(day) {
+                html += `
+                    <div class="mobile-day-card">
+                        <div class="mobile-day-header">
+                            <span>${day.name}</span>
+                            <div class="day-number">${day.id}</div>
+                        </div>
+                        <div class="day-content">
+                `;
+                
+                // 为该天的每个时间段添加课程
+                for (let time = 1; time <= 12; time++) {
+                    const slotCourses = courses.filter(function(course) {
+                        return parseInt(course.day) === day.id && parseInt(course.time) === time;
+                    });
+                    
+                    html += `
+                        <div class="mobile-course-slot">
+                            <div class="mobile-time-col">
+                                <div class="mobile-time-label">${timeSlots[time].label}</div>
+                                <div class="mobile-time-period">${timeSlots[time].period}</div>
+                            </div>
+                            <div class="mobile-course-col">
+                    `;
+                    
+                    if (slotCourses.length > 0) {
+                        slotCourses.forEach(function(course) {
+                            const textColor = getContrastColor(course.color);
+                            html += `
+                                <div class="mobile-course-item" style="background-color: ${course.color}; color: ${textColor}; border-left-color: ${course.color};" data-id="${course.id}">
+                                    <div class="mobile-course-name">${course.name}</div>
+                                    <div class="mobile-course-details">
+                                        <span class="course-tag">${course.location || '无地点'}</span>
+                                        ${course.teacher ? `<span class="course-tag">${course.teacher}</span>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        html += `<div class="empty-course">暂无课程</div>`;
+                    }
+                    
+                    html += `</div></div>`;
+                }
+                
+                html += `</div></div>`;
+            });
+            
+            mobileTimetable.innerHTML = html;
+            
+            // 为移动端课程项添加点击事件
+            document.querySelectorAll('.mobile-course-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    const courseId = this.getAttribute('data-id');
+                    showCourseDetail(courseId);
+                });
+            });
+        }
+        
+        // 获取星期名称
+        function getDayName(day) {
+            const days = ['', '周一', '周二', '周三', '周四', '周五'];
+            return days[parseInt(day)] || '';
+        }
+        
+        // 获取时间段文本（短格式）
+        function getTimeSlotShort(time) {
+            const timeSlots = ['', 
+                '第1节', 
+                '第2节', 
+                '第3节', 
+                '第4节', 
+                '第5节',
+                '第6节',
+                '第7节',
+                '第8节',
+                '第9节',
+                '第10节',
+                '晚自习',
+                '晚自习'
+            ];
+            return timeSlots[parseInt(time)] || '';
+        }
+        
+        // 获取时间段文本（完整格式）
+        function getTimeSlot(time) {
+            const timeSlots = ['', 
+                '第一节 08:30-09:10', 
+                '第二节 09:15-09:55', 
+                '第三节 10:15-10:55', 
+                '第四节 11:00-11:40', 
+                '第五节 11:45-12:25',
+                '第六节 13:00-14:10',
+                '第七节 14:15-14:55',
+                '第八节 15:00-15:40',
+                '第九节 16:00-16:40',
+                '第十节 16:45-17:25',
+                '晚自习 19:00-20:20',
+                '晚自习 20:30-21:45'
+            ];
+            return timeSlots[parseInt(time)] || '';
+        }
+        
+        // 获取对比色
+        function getContrastColor(hexColor) {
+            hexColor = hexColor.replace('#', '');
+            
+            if (hexColor.length === 3) {
+                hexColor = hexColor.split('').map(function(c) {
+                    return c + c;
+                }).join('');
+            }
+            
+            const r = parseInt(hexColor.slice(0, 2), 16);
+            const g = parseInt(hexColor.slice(2, 4), 16);
+            const b = parseInt(hexColor.slice(4, 6), 16);
+            
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            
+            return brightness > 128 ? '#000000' : '#FFFFFF';
+        }
+        
+        // 打开添加课程模态框
+        function openAddCourseModal() {
+            document.getElementById('modal-title').textContent = '添加课程';
+            document.getElementById('course-form').reset();
+            document.getElementById('course-id').value = '';
+            document.getElementById('course-color').value = '#CD5C5C';
+            
+            // 重置颜色选择器
+            document.querySelectorAll('.color-option').forEach(function(o) {
+                o.classList.remove('selected');
+                if (o.dataset.color === '#CD5C5C') {
+                    o.classList.add('selected');
+                }
+            });
+            
+            document.getElementById('course-modal').classList.remove('hidden');
+            currentCourseId = null;
+            
+            // 移动端关闭侧边栏
+            if (window.innerWidth <= 768) {
+                document.getElementById('mobile-sidebar').classList.remove('active');
+                document.getElementById('mobile-sidebar-overlay').classList.remove('active');
+            }
+        }
+        
+        // 关闭课程模态框
+        function closeCourseModal() {
+            document.getElementById('course-modal').classList.add('hidden');
+        }
+        
+        // 保存课程
+        function saveCourse(e) {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const id = document.getElementById('course-id').value || 'course_' + Date.now();
+            const name = document.getElementById('course-name').value.trim();
+            const day = document.getElementById('course-day').value;
+            const time = document.getElementById('course-time').value;
+            const location = document.getElementById('course-location').value.trim();
+            const teacher = document.getElementById('course-teacher').value.trim();
+            const color = document.getElementById('course-color').value;
+            
+            // 验证
+            if (!name) {
+                alert('请输入课程名称！');
+                return;
+            }
+            
+            if (!day) {
+                alert('请选择星期！');
+                return;
+            }
+            
+            if (!time) {
+                alert('请选择时间段！');
+                return;
+            }
+            
+            // 检查时间冲突
+            const conflict = courses.find(function(course) {
+                return course.day === day && 
+                       course.time === time && 
+                       course.id !== id;
+            });
+            
+            if (conflict) {
+                alert(`时间冲突！该时间段已有课程：${conflict.name}`);
+                return;
+            }
+            
+            const courseData = { 
+                id, 
+                name, 
+                day, 
+                time, 
+                location: location || '未设置', 
+                teacher: teacher || '未设置', 
+                color 
+            };
+            
+            // 编辑或添加
+            if (currentCourseId && courses.some(function(c) { return c.id === currentCourseId; })) {
+                const index = courses.findIndex(function(course) {
+                    return course.id === currentCourseId;
+                });
+                if (index !== -1) {
+                    courses[index] = courseData;
+                }
+            } else {
+                courses.push(courseData);
+            }
+            
+            // 保存到本地存储
+            localStorage.setItem('classical-timetable-courses', JSON.stringify(courses));
+            
+            // 更新界面
+            renderCourseList();
+            renderMobileCourseList();
+            renderTimetable();
+            closeCourseModal();
+            
+            // 移动端友好提示
+            setTimeout(function() {
+                alert('课程保存成功！');
+            }, 100);
+        }
+        
+        // 显示课程详情
+        function showCourseDetail(id) {
+            const course = courses.find(function(c) { return c.id === id; });
+            
+            if (!course) {
+                alert('课程不存在！');
+                return;
+            }
+            
+            // 设置当前课程ID
+            currentCourseId = course.id;
+            
+            // 填充详情数据
+            document.getElementById('detail-course-name').textContent = course.name;
+            document.getElementById('detail-course-time').textContent = `${getDayName(course.day)} ${getTimeSlot(course.time)}`;
+            document.getElementById('detail-course-location').textContent = course.location;
+            document.getElementById('detail-course-teacher').textContent = course.teacher;
+            
+            // 显示详情模态框
+            document.getElementById('course-detail-modal').classList.remove('hidden');
+        }
+        
+        // 关闭课程详情模态框
+        function closeDetailModal() {
+            document.getElementById('course-detail-modal').classList.add('hidden');
+            currentCourseId = null;
+        }
+        
+        // 编辑课程
+        function editCourse() {
+            if (!currentCourseId) {
+                alert('未选择课程！');
+                return;
+            }
+            
+            closeDetailModal();
+            
+            const course = courses.find(function(c) { return c.id === currentCourseId; });
+            if (!course) {
+                alert('课程不存在！');
+                return;
+            }
+            
+            // 填充编辑表单
+            document.getElementById('modal-title').textContent = '编辑课程';
+            document.getElementById('course-id').value = course.id;
+            document.getElementById('course-name').value = course.name;
+            document.getElementById('course-day').value = course.day;
+            document.getElementById('course-time').value = course.time;
+            document.getElementById('course-location').value = course.location;
+            document.getElementById('course-teacher').value = course.teacher;
+            document.getElementById('course-color').value = course.color;
+            
+            // 选中对应颜色
+            document.querySelectorAll('.color-option').forEach(function(o) {
+                o.classList.remove('selected');
+                if (o.dataset.color === course.color) {
+                    o.classList.add('selected');
+                }
+            });
+            
+            // 显示编辑模态框
+            document.getElementById('course-modal').classList.remove('hidden');
+        }
+        
+        // 删除课程
+        function deleteCourse() {
+            if (!currentCourseId) {
+                alert('未选择要删除的课程！');
+                return;
+            }
+            
+            const course = courses.find(function(c) { return c.id === currentCourseId; });
+            if (!course) {
+                alert('课程不存在或已被删除！');
+                closeDetailModal();
+                return;
+            }
+            
+            if (!confirm(`确定要删除课程 "${course.name}" 吗？`)) {
+                return;
+            }
+            
+            // 删除课程
+            const index = courses.findIndex(function(c) { return c.id === currentCourseId; });
+            if (index !== -1) {
+                courses.splice(index, 1);
+            }
+            
+            // 更新本地存储
+            localStorage.setItem('classical-timetable-courses', JSON.stringify(courses));
+            
+            // 更新界面
+            renderCourseList();
+            renderMobileCourseList();
+            renderTimetable();
+            
+            // 关闭详情模态框
+            closeDetailModal();
+            
+            // 成功提示
+            setTimeout(function() {
+                alert('课程删除成功！');
+            }, 100);
+        }
+        
+        // 切换主题
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.getElementById('toggle-theme');
+            
+            if (body.classList.contains('dark-theme')) {
+                body.classList.remove('dark-theme');
+                button.innerHTML = '<i class="fa-solid fa-moon mr-1"></i> 主题';
+            } else {
+                body.classList.add('dark-theme');
+                button.innerHTML = '<i class="fa-solid fa-sun mr-1"></i> 主题';
+            }
+        }
+    </script>
+</body>
+</html>
